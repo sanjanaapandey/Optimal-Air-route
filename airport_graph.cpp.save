@@ -1,0 +1,122 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <unordered_map>
+#include <limits>
+#include <queue>
+
+using namespace std;
+
+struct Edge {
+    string destination;
+    int distance;
+};
+
+class Graph {
+public:
+    unordered_map<string, vector<Edge>> adjList;
+
+    void addEdge(const string& src, const string& dest, int dist) {
+        adjList[src].push_back({dest, dist});
+    }
+
+    void printGraph() {
+        for (const auto& pair : adjList) {
+            cout << pair.first << " -> ";
+            for (const auto& edge : pair.second) {
+                cout << "(" << edge.destination << ", " << edge.distance << ") ";
+            }
+            cout << endl;
+        }
+    }
+};
+
+void loadRoutes(Graph& graph, const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Unable to open file " << filename << endl;
+        return;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        vector<string> tokens;
+        string token;
+        while (getline(ss, token, ',')) {
+            tokens.push_back(token);
+        }
+
+        if (tokens.size() >= 5) {  // Ensure valid data
+            string source = tokens[2];
+            string destination = tokens[4];
+            int distance = (tokens[5] != "\\N") ? stoi(tokens[5]) : 1000; // Default distance if missing
+            graph.addEdge(source, destination, distance);
+        }
+    }
+    file.close();
+}
+
+int main() {
+    Graph airportGraph;
+    loadRoutes(airportGraph, "routes.dat");
+    airportGraph.printGraph()#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <queue>
+#include <limits>
+
+using namespace std;
+
+class AirportGraph {
+private:
+    unordered_map<string, vector<pair<string, int>>> adjList; // Airport -> [(Destination, Distance)]
+
+public:
+    void addEdge(const string& src, const string& dest, int distance) {
+        adjList[src].push_back({dest, distance});
+        adjList[dest].push_back({src, distance}); // Assuming undirected graph
+    }
+
+    void dijkstra(const string& start) {
+        unordered_map<string, int> distances;
+        priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
+        
+        for (const auto& [airport, _] : adjList) {
+            distances[airport] = numeric_limits<int>::max();
+        }
+        distances[start] = 0;
+        pq.push({0, start});
+        
+        while (!pq.empty()) {
+            auto [currDist, currAirport] = pq.top(); pq.pop();
+            if (currDist > distances[currAirport]) continue;
+            
+            for (const auto& [neighbor, weight] : adjList[currAirport]) {
+                int newDist = currDist + weight;
+                if (newDist < distances[neighbor]) {
+                    distances[neighbor] = newDist;
+                    pq.push({newDist, neighbor});
+                }
+            }
+        }
+        
+        cout << "Shortest distances from " << start << ":\n";
+        for (const auto& [airport, dist] : distances) {
+            cout << airport << " -> " << (dist == numeric_limits<int>::max() ? "INF" : to_string(dist)) << "\n";
+        }
+    }
+};
+
+int main() {
+    AirportGraph graph;
+    graph.addEdge("JFK", "LAX", 3000);
+    graph.addEdge("JFK", "ORD", 800);
+    graph.addEdge("ORD", "LAX", 2000);
+    graph.addEdge("LAX", "DFW", 1500);
+    graph.addEdge("DFW", "JFK", 1600);
+    
+    graph.dijkstra("JFK");
+    return 0;
+}
