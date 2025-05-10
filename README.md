@@ -23,7 +23,6 @@ brew install sdl2
 # Ubuntu/Debian
 sudo apt install libsdl2-dev
 
-```
 How to Run This C++ Project on Your Local Device
 Step 1: Clone the Project
 
