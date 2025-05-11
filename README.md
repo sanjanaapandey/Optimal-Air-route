@@ -27,7 +27,7 @@ How to Run This C++ Project on Your Local Device
 Step 1: Clone the Project
 
 git clone https://github.com/sanjanaapandey/Optimal-Air-route-planner.git
-cd Optimal-Air-route
+cd Optimal-Air-route-SANJANA
 
 Step 2: Build the Project
 
